@@ -14,7 +14,7 @@ from math import atan2, pi
 # distances in meters
 HOSE_HEIGHT = 1 * 1e3
 SPRAY_SIDELEN = 2 * 1e3
-NUM_NOZZLES = 13    # 3/2 pressure, 0.5mm hole radius, ((15.875 mm/2)^2*pi) *2/3 / ((0.5 mm)^2*pi)
+NUM_NOZZLES = 14    # 3/2 pressure, 0.5mm hole radius, ((15.875 mm/2)^2*pi) *2/3 / ((0.5 mm)^2*pi)
 NOZZLE_DEPTH = 5 * 10
 NOZZLE_SIDELEN = 12 * 10
 HOLE_RADIUS = 0.5
@@ -68,19 +68,43 @@ def make_cylinder_from_nozzle_normal(from_x, up, r=HOLE_RADIUS, h=10):
 
 
 
+
 if __name__ == '__main__':
     for floor_coord in get_coords(NUM_NOZZLES, SPRAY_SIDELEN):
         x, y = get_angles_for_floor_coord(floor_coord, [0, 0, HOSE_HEIGHT])
         # print(f"{x:.2f} {y:.2f}")
 
     # scad = cube([NOZZLE_SIDELEN, NOZZLE_SIDELEN, NOZZLE_DEPTH], center=True).up(-NOZZLE_DEPTH/2 + HOSE_HEIGHT)
-    scad = sphere(r=1)
+    holes = sphere(r=1)
 
     for floor_coord in tqdm(get_coords(NUM_NOZZLES, SPRAY_SIDELEN)):
         # x, y, z = floor_coord
         eangles = get_angles_for_floor_coord(floor_coord, [0, 0, HOSE_HEIGHT])
-        scad += make_cylinder_from_nozzle_normal(*eangles, h=80)
+        holes += make_cylinder_from_nozzle_normal(*eangles, h=80)
         # scad += translate(floor_coord)(cylinder(r=HOLE_RADIUS*5e1, h=1))
 
 # scad -= hole()(translate([0, 0, -1])(cylinder(r=2, h=12)))
-    scad_render_to_file(scad, "square_nozzle.scad", file_header=f'$fn = {SEGMENTS};',)
+    # nozzle = cube(50, 50, 20, center=True).down(10)
+    scad_render_to_file(holes - sphere(r=50), "square_nozzle.scad", file_header=f'$fn = {SEGMENTS};',)
+
+
+
+
+
+# if __name__ == '__main__':
+#     for floor_coord in get_coords(NUM_NOZZLES, SPRAY_SIDELEN):
+#         x, y = get_angles_for_floor_coord(floor_coord, [0, 0, HOSE_HEIGHT])
+#         # print(f"{x:.2f} {y:.2f}")
+#
+#     # scad = cube([NOZZLE_SIDELEN, NOZZLE_SIDELEN, NOZZLE_DEPTH], center=True).up(-NOZZLE_DEPTH/2 + HOSE_HEIGHT)
+#     holes = sphere(r=1)
+#
+#     for floor_coord in tqdm(get_coords(NUM_NOZZLES, SPRAY_SIDELEN)):
+#         # x, y, z = floor_coord
+#         eangles = get_angles_for_floor_coord(floor_coord, [0, 0, HOSE_HEIGHT])
+#         holes += make_cylinder_from_nozzle_normal(*eangles, h=80)
+#         # scad += translate(floor_coord)(cylinder(r=HOLE_RADIUS*5e1, h=1))
+#
+# # scad -= hole()(translate([0, 0, -1])(cylinder(r=2, h=12)))
+#     nozzle = cube(50, 50, 20, center=True).down(10)
+#     scad_render_to_file(nozzle - holes, "square_nozzle.scad", file_header=f'$fn = {SEGMENTS};',)
