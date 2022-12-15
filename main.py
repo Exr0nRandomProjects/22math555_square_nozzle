@@ -19,7 +19,7 @@ NOZZLE_DEPTH = 5 * 10
 NOZZLE_SIDELEN = 12 * 10
 HOLE_RADIUS = 0.25
 
-SEGMENTS = 100
+SEGMENTS = 10
 
 # farthest_distance = -1 + 1/NUM_NOZZLES
 
@@ -79,7 +79,7 @@ if __name__ == '__main__':
     for floor_coord in tqdm(get_coords(NUM_NOZZLES, SPRAY_SIDELEN)):
         # x, y, z = floor_coord
         eangles = get_angles_for_floor_coord(floor_coord, [0, 0, HOSE_HEIGHT])
-        scad += make_cylinder_from_nozzle_normal(*eangles, h=100)
+        scad += make_cylinder_from_nozzle_normal(*eangles, h=15)
         # scad += translate(floor_coord)(cylinder(r=HOLE_RADIUS*5e1, h=1))
 
 # scad -= hole()(translate([0, 0, -1])(cylinder(r=2, h=12)))
