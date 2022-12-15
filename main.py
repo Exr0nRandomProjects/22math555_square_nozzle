@@ -37,20 +37,30 @@ def get_coords(n_nozzles, spray_sidelen):
                 -spray_sidelen/2 + j*square_sidelen - square_sidelen/2,
                 0
                 )
+def norm(vec):
+    from math import sqrt
+    return sqrt(sum([x**2 for x in vec]))
 
 def get_angles_for_floor_coord(floor_coord, nozzle_cord):
-    x, y, z = floor_coord
+    fx, fy, fz = floor_coord
     nx, ny, nz = nozzle_cord
-    return (deg(atan2(x-nx, nz-z)), deg(atan2(y-ny, nz-z)))
+    # return (deg(atan2(x-nx, nz-z)), deg(atan2(y-ny, nz-z)))
+    # now we doing euler angles yooo
+    print(fx-nx, fy-ny, norm([fx, fy]), nz-fz)
+    return [deg(atan2(fy-ny, fx-nx)), deg(atan2( norm([fx, fy]), nz-fz ))]
 
 
+def make_cylinder_from_nozzle_normal(from_x, up, r=HOLE_RADIUS, h=10):
+    return cylinder(r=r, h=h).down(h).rotateY(-up).rotateZ(from_x)
 
 if __name__ == '__main__':
     HEIGHT = 10
-    scad =  cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateY(-45)
-    scad += cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateX(-45)
-    scad += cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateX(-45).rotateY(-45)
-    scad += cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateY(-45).rotateX(-45)
+    eangles = get_angles_for_floor_coord([0, -1000, 0], [0, 0, HOSE_HEIGHT])
+    scad = make_cylinder_from_nozzle_normal(*eangles, h=HEIGHT)
+    # scad =  cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateY(-90) .rotateY(-45).rotateZ(90)
+    # scad += cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateX(45)
+    # scad += cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateX(45).rotateY(45)
+    # scad += cylinder(r=HOLE_RADIUS, h=HEIGHT).down(HEIGHT).rotateY(45).rotateX(45)
     scad_render_to_file(scad, 'square_nozzle.scad', file_header=f'$fn = {SEGMENTS};')
     print('done')
 
